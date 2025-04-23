@@ -1,4 +1,54 @@
-\documentclass{article}
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage[margin=1.0in]{geometry} % To set margins
 \usepackage{amsmath}  % This allows me to use the align functionality.
                       % If you find yourself trying to replicate
@@ -12,11 +62,9 @@
 \usepackage{float}    % For telling R where to put a table/figure
 \usepackage{natbib}        %For the bibliography
 \bibliographystyle{apalike}%For the bibliography
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
-<<echo=F, message=F, warning=F>>=
-library(tidyverse)
-@
+
 
 \begin{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,21 +97,35 @@ alternative.
 \begin{enumerate}
   \item What values of $t_{20}$ provide statistically discernible support for the
   alternative hypothesis?
-<<echo=TRUE, message=FALSE, warning=FALSE>>=
-library(tidyverse)
-n20 <- 20
-(val <- qt(0.95, df = n20-1))
-@
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hldef{(tidyverse)}
+\hldef{n20} \hlkwb{<-} \hlnum{20}
+\hldef{(val} \hlkwb{<-} \hlkwd{qt}\hldef{(}\hlnum{0.95}\hldef{,} \hlkwc{df} \hldef{= n20}\hlopt{-}\hlnum{1}\hldef{))}
+\end{alltt}
+\begin{verbatim}
+## [1] 1.729133
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 To get a p-value which is less than 0.05 which gives us a statistically discernible support for the alternative, we need a $t_{20}$ value of greater than $1.7291$.
 
 
   \item What values of $t_{30}$ provide statistically discernible support for the
   alternative hypothesis?
-<<echo=TRUE, message=FALSE, warning=FALSE>>=
-n30 <- 30
-(val.30 <- qt(0.95, df = n30-1))
-@
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{n30} \hlkwb{<-} \hlnum{30}
+\hldef{(val.30} \hlkwb{<-} \hlkwd{qt}\hldef{(}\hlnum{0.95}\hldef{,} \hlkwc{df} \hldef{= n30}\hlopt{-}\hlnum{1}\hldef{))}
+\end{alltt}
+\begin{verbatim}
+## [1] 1.699127
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 To get a p-value which is less than 0.05 which gives us a statistically discernible support for the alternative, we need a $t_{30}$ value of greater than $1.6991$.
 
@@ -75,48 +137,70 @@ To get a p-value which is less than 0.05 which gives us a statistically discerni
   \item \textbf{Optional Challenge:} Can you find a value of $\alpha<0.05$ that yields a 
   Type I error rate of 0.05?
   
-<<message = F, warning = F>>=
-# part C 
-# simulation study
-library(VGAM)
-num.sims <- 10000
-a <- 0
-b <- 4.0
-mu0 <- 0
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# part C }
+\hlcom{# simulation study}
+\hlkwd{library}\hldef{(VGAM)}
+\hldef{num.sims} \hlkwb{<-} \hlnum{10000}
+\hldef{a} \hlkwb{<-} \hlnum{0}
+\hldef{b} \hlkwb{<-} \hlnum{4.0}
+\hldef{mu0} \hlkwb{<-} \hlnum{0}
 
-# errors
-type1error.20.count <- 0
-type1error.30.count <- 0
-no.error.count <- 0
+\hlcom{# errors}
+\hldef{type1error.20.count} \hlkwb{<-} \hlnum{0}
+\hldef{type1error.30.count} \hlkwb{<-} \hlnum{0}
+\hldef{no.error.count} \hlkwb{<-} \hlnum{0}
 
-for(i in 1:num.sims){
-  # sims for n = 20 peek, n = 30
-  sim30.curr <- rlaplace(n=30, location = a, scale = b)
-  sim20.curr <- sim30.curr[1:20]
-  
-  # t test for n = 20 peek
-  n20.stat <- t.test(x = sim20.curr, mu = mu0, alternative = "greater")
-  
-  if (n20.stat$p.value < 0.05){
-    type1error.20.count <- type1error.20.count + 1
-  }else{
-    
-    n30.stat <- t.test(x = sim30.curr, mu = mu0, alternative = "greater")
-    
-    if (n30.stat$p.value < 0.05){
-      type1error.30.count <- type1error.30.count + 1
-    } else {
-      no.error.count <- no.error.count + 1
-    }
-  }
-}
+\hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{num.sims)\{}
+  \hlcom{# sims for n = 20 peek, n = 30}
+  \hldef{sim30.curr} \hlkwb{<-} \hlkwd{rlaplace}\hldef{(}\hlkwc{n}\hldef{=}\hlnum{30}\hldef{,} \hlkwc{location} \hldef{= a,} \hlkwc{scale} \hldef{= b)}
+  \hldef{sim20.curr} \hlkwb{<-} \hldef{sim30.curr[}\hlnum{1}\hlopt{:}\hlnum{20}\hldef{]}
+
+  \hlcom{# t test for n = 20 peek}
+  \hldef{n20.stat} \hlkwb{<-} \hlkwd{t.test}\hldef{(}\hlkwc{x} \hldef{= sim20.curr,} \hlkwc{mu} \hldef{= mu0,} \hlkwc{alternative} \hldef{=} \hlsng{"greater"}\hldef{)}
+
+  \hlkwa{if} \hldef{(n20.stat}\hlopt{$}\hldef{p.value} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{type1error.20.count} \hlkwb{<-} \hldef{type1error.20.count} \hlopt{+} \hlnum{1}
+  \hldef{\}}\hlkwa{else}\hldef{\{}
+
+    \hldef{n30.stat} \hlkwb{<-} \hlkwd{t.test}\hldef{(}\hlkwc{x} \hldef{= sim30.curr,} \hlkwc{mu} \hldef{= mu0,} \hlkwc{alternative} \hldef{=} \hlsng{"greater"}\hldef{)}
+
+    \hlkwa{if} \hldef{(n30.stat}\hlopt{$}\hldef{p.value} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+      \hldef{type1error.30.count} \hlkwb{<-} \hldef{type1error.30.count} \hlopt{+} \hlnum{1}
+    \hldef{\}} \hlkwa{else} \hldef{\{}
+      \hldef{no.error.count} \hlkwb{<-} \hldef{no.error.count} \hlopt{+} \hlnum{1}
+    \hldef{\}}
+  \hldef{\}}
+\hldef{\}}
 
 
-(prop.20 <- type1error.20.count/num.sims)
-(prop.30 <- type1error.30.count/num.sims)
-(prop.no <- no.error.count/num.sims)
-(tot.type1.error <- (type1error.20.count + type1error.30.count)/num.sims)
-@
+\hldef{(prop.20} \hlkwb{<-} \hldef{type1error.20.count}\hlopt{/}\hldef{num.sims)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.0494
+\end{verbatim}
+\begin{alltt}
+\hldef{(prop.30} \hlkwb{<-} \hldef{type1error.30.count}\hlopt{/}\hldef{num.sims)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.0269
+\end{verbatim}
+\begin{alltt}
+\hldef{(prop.no} \hlkwb{<-} \hldef{no.error.count}\hlopt{/}\hldef{num.sims)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.9237
+\end{verbatim}
+\begin{alltt}
+\hldef{(tot.type1.error} \hlkwb{<-} \hldef{(type1error.20.count} \hlopt{+} \hldef{type1error.30.count)}\hlopt{/}\hldef{num.sims)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.0763
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 A type 1 error is described as when we accidentally find statistically discernible support for the alternative although the null is correct. This entails falsely rejecting the null hypothesis for the alternative, which is not true. As can be seen through the proportions, for our simulation we saw about 7.04\% type 1 error which means that we successfully made the right descion 92.96\% of the time. When checking for the type 1 error after time 20, we see a type 1 error about 4.63\% of the time and a type 1 error 2.41\% of the time for time 30. As can be seen in the percentages, the time 30 percentage is lower than the time 20 percentage meaning the decsion was more accurate. NOTE: The percentages are subject to change as each simulation is unique and the ones in the paragraph are from a particular trial.
 \end{enumerate}
