@@ -131,16 +131,100 @@ A type 1 error is described as when we accidentally find statistically discernib
   the actual mean for each case (e.g., $\frac{10}{10+2}$, $\frac{2}{10+2}$, and 
   $\frac{10}{10+10}$). 
   
+    <<warning = F, message = F>>=
+# Problem 2
+# set.seed() so results reproducible (can use xtable)
+set.seed(7272)
+type1.errors <- function(a, b){
+  num.sims <- 1000
+  alpha <- a
+  beta <- b
+  pop.mean <- alpha/(alpha + beta)
+  samp.size <- 15
+  
+  # errors
+  right.errors <- 0 
+  left.errors <- 0
+  two.errors <- 0
+  
+  for(i in 1:num.sims){
+    # sims using rbeta, n = 15
+    curr.sim <- rbeta(n=samp.size, shape1 = alpha, shape2 = beta)
+    
+    # t test for right tail 
+    right.t <- t.test(x=curr.sim, mu = pop.mean, alternative = "greater")
+    right.p <- right.t$p.value
+    # t test for left tail 
+    left.t <- t.test(x=curr.sim, mu = pop.mean, alternative = "less")
+    left.p <- left.t$p.value
+    # t test for two tailed
+    two.t <- t.test(x=curr.sim, mu = pop.mean, alternative = "two.sided")
+    twotail.p <- two.t$p.value
+    
+    # count errors
+    if (right.p < 0.05){
+      right.errors <- right.errors + 1
+    }
+    if (left.p < 0.05){
+      left.errors <- left.errors + 1
+    }
+    if(twotail.p < 0.05){
+      two.errors <- two.errors + 1
+    }
+  }
+  
+  # find proportion
+  right.e <- right.errors/num.sims
+  left.e <- left.errors/num.sims
+  two.e <- two.errors/num.sims
+  
+  tibble(type = c("left tailed", "right tailed", "two-tailed"),
+         errors = c(left.e, right.e, two.e)) |>
+    pivot_wider(names_from = type, values_from = errors)
+}
+
+errors.data <- tibble(bind_rows(type1.errors(a = 10, b = 2),
+type1.errors(a = 2, b = 10),
+type1.errors(a = 10, b = 10)))
+
+# consolidate data 
+(errors.table <- tibble(distribution = c("Beta(10,2)", "Beta(2,10)", 
+                                        "Beta(10,10)"), errors.data))
+library(xtable)
+xtable(errors.table)
+@
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrr}
+\hline
+& distribution & left tailed & right tailed & two-tailed \\
+\hline
+1 & Beta(10,2) & 0.03 & 0.06 & 0.04 \\
+2 & Beta(2,10) & 0.07 & 0.04 & 0.05 \\
+3 & Beta(10,10) & 0.04 & 0.05 & 0.05 \\
+\hline
+\end{tabular}
+\end{table}
   
   \begin{enumerate}
     \item What proportion of the time do we make an error of Type I for a
     left-tailed test?
+    
+    \textbf{Solution:} A Type I error for a left-tailed test is \Sexpr{errors.data$`left tailed`[1]} for a Beta(10, 2) distribution, \Sexpr{errors.data$`left tailed`[2]} for a Beta(2, 10) distribution, and \Sexpr{errors.data$`left tailed`[3]} for a Beta(10, 10) distribution.
+    
     \item What proportion of the time do we make an error of Type I for a
     right-tailed test?
+    
+    \textbf{Solution:} A Type I error for a right-tailed test is \Sexpr{errors.data$`right tailed`[1]} for a Beta(10, 2) distribution, \Sexpr{errors.data$`right tailed`[2]} for a Beta(2, 10) distribution, and \Sexpr{errors.data$`right tailed`[3]} for a Beta(10, 10) distribution.
     \item What proportion of the time do we make an error of Type I for a
     two-tailed test?
+    
+    \textbf{Solution:} A Type I error for a right-tailed test is \Sexpr{errors.data$`two-tailed`[1]} for a Beta(10, 2) distribution, \Sexpr{errors.data$`two-tailed`[2]} for a Beta(2, 10) distribution, and \Sexpr{errors.data$`two-tailed`[3]} for a Beta(10, 10) distribution.
     \item How does skewness of the underlying population distribution effect
     Type I error across the test types?
+    
+    \textbf{Solution:} For a Beta(10, 2) distribution, which is left skewed, we can see that the proportion for right-tailed tests is higher than the proportion for left-tailed tests. For a Beta(2, 10) distribution, which is right skewed, we can see that the proportion for left-tailed tests is higher than the proportion for right-tailed tests. For a Beta(10, 10) distribution, which is symmetric, we can see that the proportion for the right-tailed, left-tailed, and two-tailed tests is about the same. 
   \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

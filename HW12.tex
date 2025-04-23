@@ -179,25 +179,25 @@ To get a p-value which is less than 0.05 which gives us a statistically discerni
 \hldef{(prop.20} \hlkwb{<-} \hldef{type1error.20.count}\hlopt{/}\hldef{num.sims)}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.0494
+## [1] 0.0517
 \end{verbatim}
 \begin{alltt}
 \hldef{(prop.30} \hlkwb{<-} \hldef{type1error.30.count}\hlopt{/}\hldef{num.sims)}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.0269
+## [1] 0.0253
 \end{verbatim}
 \begin{alltt}
 \hldef{(prop.no} \hlkwb{<-} \hldef{no.error.count}\hlopt{/}\hldef{num.sims)}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.9237
+## [1] 0.923
 \end{verbatim}
 \begin{alltt}
 \hldef{(tot.type1.error} \hlkwb{<-} \hldef{(type1error.20.count} \hlopt{+} \hldef{type1error.30.count)}\hlopt{/}\hldef{num.sims)}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.0763
+## [1] 0.077
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -215,16 +215,130 @@ A type 1 error is described as when we accidentally find statistically discernib
   the actual mean for each case (e.g., $\frac{10}{10+2}$, $\frac{2}{10+2}$, and 
   $\frac{10}{10+10}$). 
   
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Problem 2}
+\hlcom{# set.seed() so results reproducible (can use xtable)}
+\hlkwd{set.seed}\hldef{(}\hlnum{7272}\hldef{)}
+\hldef{type1.errors} \hlkwb{<-} \hlkwa{function}\hldef{(}\hlkwc{a}\hldef{,} \hlkwc{b}\hldef{)\{}
+  \hldef{num.sims} \hlkwb{<-} \hlnum{1000}
+  \hldef{alpha} \hlkwb{<-} \hldef{a}
+  \hldef{beta} \hlkwb{<-} \hldef{b}
+  \hldef{pop.mean} \hlkwb{<-} \hldef{alpha}\hlopt{/}\hldef{(alpha} \hlopt{+} \hldef{beta)}
+  \hldef{samp.size} \hlkwb{<-} \hlnum{15}
+
+  \hlcom{# errors}
+  \hldef{right.errors} \hlkwb{<-} \hlnum{0}
+  \hldef{left.errors} \hlkwb{<-} \hlnum{0}
+  \hldef{two.errors} \hlkwb{<-} \hlnum{0}
+
+  \hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{num.sims)\{}
+\hlcom{# sims using rbeta, n = 15}
+\hldef{curr.sim} \hlkwb{<-} \hlkwd{rbeta}\hldef{(}\hlkwc{n}\hldef{=samp.size,} \hlkwc{shape1} \hldef{= alpha,} \hlkwc{shape2} \hldef{= beta)}
+
+\hlcom{# t test for right tail }
+\hldef{right.t} \hlkwb{<-} \hlkwd{t.test}\hldef{(}\hlkwc{x}\hldef{=curr.sim,} \hlkwc{mu} \hldef{= pop.mean,} \hlkwc{alternative} \hldef{=} \hlsng{"greater"}\hldef{)}
+\hldef{right.p} \hlkwb{<-} \hldef{right.t}\hlopt{$}\hldef{p.value}
+\hlcom{# t test for left tail }
+\hldef{left.t} \hlkwb{<-} \hlkwd{t.test}\hldef{(}\hlkwc{x}\hldef{=curr.sim,} \hlkwc{mu} \hldef{= pop.mean,} \hlkwc{alternative} \hldef{=} \hlsng{"less"}\hldef{)}
+\hldef{left.p} \hlkwb{<-} \hldef{left.t}\hlopt{$}\hldef{p.value}
+\hlcom{# t test for two tailed}
+\hldef{two.t} \hlkwb{<-} \hlkwd{t.test}\hldef{(}\hlkwc{x}\hldef{=curr.sim,} \hlkwc{mu} \hldef{= pop.mean,} \hlkwc{alternative} \hldef{=} \hlsng{"two.sided"}\hldef{)}
+\hldef{twotail.p} \hlkwb{<-} \hldef{two.t}\hlopt{$}\hldef{p.value}
+
+\hlcom{# count errors}
+\hlkwa{if} \hldef{(right.p} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+  \hldef{right.errors} \hlkwb{<-} \hldef{right.errors} \hlopt{+} \hlnum{1}
+\hldef{\}}
+\hlkwa{if} \hldef{(left.p} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+  \hldef{left.errors} \hlkwb{<-} \hldef{left.errors} \hlopt{+} \hlnum{1}
+\hldef{\}}
+\hlkwa{if}\hldef{(twotail.p} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+  \hldef{two.errors} \hlkwb{<-} \hldef{two.errors} \hlopt{+} \hlnum{1}
+\hldef{\}}
+  \hldef{\}}
+
+  \hlcom{# find proportion}
+  \hldef{right.e} \hlkwb{<-} \hldef{right.errors}\hlopt{/}\hldef{num.sims}
+  \hldef{left.e} \hlkwb{<-} \hldef{left.errors}\hlopt{/}\hldef{num.sims}
+  \hldef{two.e} \hlkwb{<-} \hldef{two.errors}\hlopt{/}\hldef{num.sims}
+
+  \hlkwd{tibble}\hldef{(}\hlkwc{type} \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"left tailed"}\hldef{,} \hlsng{"right tailed"}\hldef{,} \hlsng{"two-tailed"}\hldef{),}
+     \hlkwc{errors} \hldef{=} \hlkwd{c}\hldef{(left.e, right.e, two.e)) |>}
+\hlkwd{pivot_wider}\hldef{(}\hlkwc{names_from} \hldef{= type,} \hlkwc{values_from} \hldef{= errors)}
+\hldef{\}}
+
+\hldef{errors.data} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwd{bind_rows}\hldef{(}\hlkwd{type1.errors}\hldef{(}\hlkwc{a} \hldef{=} \hlnum{10}\hldef{,} \hlkwc{b} \hldef{=} \hlnum{2}\hldef{),}
+\hlkwd{type1.errors}\hldef{(}\hlkwc{a} \hldef{=} \hlnum{2}\hldef{,} \hlkwc{b} \hldef{=} \hlnum{10}\hldef{),}
+\hlkwd{type1.errors}\hldef{(}\hlkwc{a} \hldef{=} \hlnum{10}\hldef{,} \hlkwc{b} \hldef{=} \hlnum{10}\hldef{)))}
+
+\hlcom{# consolidate data }
+\hldef{(errors.table} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{distribution} \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"Beta(10,2)"}\hldef{,} \hlsng{"Beta(2,10)"}\hldef{,}
+                                    \hlsng{"Beta(10,10)"}\hldef{), errors.data))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 3 x 4
+##   distribution `left tailed` `right tailed` `two-tailed`
+##   <chr>                <dbl>          <dbl>        <dbl>
+## 1 Beta(10,2)           0.03           0.064        0.044
+## 2 Beta(2,10)           0.074          0.035        0.047
+## 3 Beta(10,10)          0.038          0.049        0.05
+\end{verbatim}
+\begin{alltt}
+\hlkwd{library}\hldef{(xtable)}
+\hlkwd{xtable}\hldef{(errors.table)}
+\end{alltt}
+\begin{verbatim}
+## % latex table generated in R 4.4.2 by xtable 1.8-4 package
+## % Wed Apr 23 17:29:47 2025
+## \begin{table}[ht]
+## \centering
+## \begin{tabular}{rlrrr}
+##   \hline
+##  & distribution & left tailed & right tailed & two-tailed \\ 
+##   \hline
+## 1 & Beta(10,2) & 0.03 & 0.06 & 0.04 \\ 
+##   2 & Beta(2,10) & 0.07 & 0.04 & 0.05 \\ 
+##   3 & Beta(10,10) & 0.04 & 0.05 & 0.05 \\ 
+##    \hline
+## \end{tabular}
+## \end{table}
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrr}
+\hline
+& distribution & left tailed & right tailed & two-tailed \\
+\hline
+1 & Beta(10,2) & 0.03 & 0.06 & 0.04 \\
+2 & Beta(2,10) & 0.07 & 0.04 & 0.05 \\
+3 & Beta(10,10) & 0.04 & 0.05 & 0.05 \\
+\hline
+\end{tabular}
+\end{table}
   
   \begin{enumerate}
     \item What proportion of the time do we make an error of Type I for a
     left-tailed test?
+    
+    \textbf{Solution:} A Type I error for a left-tailed test is 0.03 for a Beta(10, 2) distribution, 0.074 for a Beta(2, 10) distribution, and 0.038 for a Beta(10, 10) distribution.
+    
     \item What proportion of the time do we make an error of Type I for a
     right-tailed test?
+    
+    \textbf{Solution:} A Type I error for a right-tailed test is 0.064 for a Beta(10, 2) distribution, 0.035 for a Beta(2, 10) distribution, and 0.049 for a Beta(10, 10) distribution.
     \item What proportion of the time do we make an error of Type I for a
     two-tailed test?
+    
+    \textbf{Solution:} A Type I error for a right-tailed test is 0.044 for a Beta(10, 2) distribution, 0.047 for a Beta(2, 10) distribution, and 0.05 for a Beta(10, 10) distribution.
     \item How does skewness of the underlying population distribution effect
     Type I error across the test types?
+    
+    \textbf{Solution:} For a Beta(10, 2) distribution, which is left skewed, we can see that the proportion for right-tailed tests is higher than the proportion for left-tailed tests. For a Beta(2, 10) distribution, which is right skewed, we can see that the proportion for left-tailed tests is higher than the proportion for right-tailed tests. For a Beta(10, 10) distribution, which is symmetric, we can see that the proportion for the right-tailed, left-tailed, and two-tailed tests is about the same. 
   \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
